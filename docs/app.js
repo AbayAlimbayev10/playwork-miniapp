@@ -1,4 +1,4 @@
-const tg = window.Telegram.WebApp;
+alert("JS LOADED");const tg = window.Telegram.WebApp;
 tg.expand();
 
 document.getElementById("status").innerText =
