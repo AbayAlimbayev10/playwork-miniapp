@@ -1,4 +1,11 @@
-alert("JS LOADED");const tg = window.Telegram.WebApp;
+;const tg = window.Telegram?.WebApp;
+
+if (!tg) {
+  console.log("Not in Telegram");
+} else {
+  tg.expand();
+  console.log("In Telegram", tg.initDataUnsafe?.user);
+}const tg = window.Telegram.WebApp;
 tg.expand();
 
 document.getElementById("status").innerText =
