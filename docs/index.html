@@ -1,55 +1,17 @@
-<!doctype html>
-<html lang="ru">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PlayWork MiniApp</title>
-  <link rel="stylesheet" href="./style.css" />
+  <meta charset="UTF-8" />
+  <title>PlayWork Mini App</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      padding: 40px;
+    }
+  </style>
 </head>
-<body><h1>INDEX WORKS ✅</h1>
-  <main class="container">
-    <header class="hero">
-      <div class="logo">🎮</div>
-      <h1>Welcome to <span class="grad">PlayWork</span></h1>
-      <p class="subtitle">Daily actions → XP → Level up. Мини-игра для прокачки жизни.</p>
-    </header>
-
-    <section class="card">
-      <label class="label" for="name">Your Name</label>
-      <input id="name" class="input" placeholder="Enter your name" />
-    </section>
-
-    <section class="card">
-      <div class="row">
-        <h2 class="h2">Achievements</h2>
-        <button id="refresh" class="btn ghost">Reload</button>
-      </div>
-      <div id="achievements" class="grid"></div>
-      <p id="status" class="status"></p>
-    </section>
-
-    <!-- Modal -->
-    <div id="modal" class="modal hidden" aria-hidden="true">
-      <div class="modal__backdrop" id="modalClose"></div>
-      <div class="modal__panel" role="dialog" aria-modal="true">
-        <div class="modal__head">
-          <h3 id="modalTitle" class="modal__title">Title</h3>
-          <button class="btn ghost" id="modalX">✕</button>
-        </div>
-        <div class="modal__body">
-          <p id="modalDesc" class="modal__desc"></p>
-          <div class="meta">
-            <div><span class="k">Requirement:</span> <span id="modalReq"></span></div>
-            <div><span class="k">Progress:</span> <span id="modalProg"></span></div>
-          </div>
-        </div>
-        <div class="modal__foot">
-          <button class="btn" id="modalOk">OK</button>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <script src="./app.js"></script>
+<body>
+  <h1>PlayWork Mini App 🚀</h1>
+  <p>If you see this — GitHub Pages works.</p>
 </body>
 </html>
