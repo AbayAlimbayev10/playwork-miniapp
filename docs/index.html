@@ -1,72 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>PlayWork</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <link rel="stylesheet" href="./style.css" />
 </head>
-
 <body>
-  <div class="app">
-
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo">PW</div>
-        <div class="brandText">
-          <div class="brandName">PlayWork</div>
-          <div class="brandSub" id="subtitle">30-day challenge</div>
-        </div>
-      </div>
-
-      <button class="ghostBtn" id="resetBtn" type="button">Сброс</button>
-    </header>
-
+  <main class="wrap">
     <section class="card">
-      <div class="row">
-        <div class="titleBlock">
-          <h1 id="dayTitle">Загрузка…</h1>
-          <p class="muted" id="dayDesc">Подготовка данных</p>
-        </div>
-        <div class="pill" id="dayPill">Day ?</div>
+      <div class="brand">
+        <div class="logo">PlayWork</div>
+        <div class="sub" id="subtitle">Loading…</div>
       </div>
 
-      <div class="progressWrap">
-        <div class="progressBar">
-          <div class="progressFill" id="progressFill"></div>
+      <div class="meta">
+        <div class="pill" id="dayPill">Day 1</div>
+        <div class="pill" id="statusPill">Not started</div>
+      </div>
+
+      <div class="desc" id="dayDesc">Нажми Start чтобы начать день</div>
+
+      <div class="progress">
+        <div class="progressRow">
+          <div class="progressText" id="progressText">0 / 0</div>
+          <div class="progressText" id="streakText">Streak: 0</div>
         </div>
-        <div class="progressText">
-          <span id="progressText">0/30</span>
-          <span class="muted" id="progressPct">0%</span>
+        <div class="bar">
+          <div class="barFill" id="barFill" style="width:0%"></div>
         </div>
       </div>
 
-      <div class="divider"></div>
-
-      <div class="sectionHead">
-        <h2>Задания дня</h2>
-        <span class="muted" id="tasksCount">0 задач</span>
+      <div class="tasks">
+        <div class="tasksTitle">Today tasks</div>
+        <div id="tasksList" class="tasksList"></div>
       </div>
-
-      <div id="tasksList" class="tasksList"></div>
 
       <div class="actions">
-        <button class="primaryBtn" id="finishDayBtn" type="button" disabled>Завершить день</button>
-        <button class="secondaryBtn" id="nextDayBtn" type="button" disabled>Следующий день</button>
+        <button class="primaryBtn" id="startDayBtn" type="button">Start</button>
+        <button class="secondaryBtn" id="finishDayBtn" type="button" disabled>Done ✅</button>
+        <button class="ghostBtn" id="nextDayBtn" type="button" disabled>Next day →</button>
       </div>
 
-      <p class="hint" id="hintText">Отметь все задания, чтобы завершить день.</p>
+      <div class="footer">
+        <button class="linkBtn" id="resetBtn" type="button">Reset progress</button>
+      </div>
     </section>
+  </main>
 
-    <footer class="footer">
-      <button class="linkBtn" id="jumpTodayBtn" type="button">Перейти к текущему дню</button>
-      <span class="muted">v1.0</span>
-    </footer>
-
-  </div>
-
-  <!-- Telegram WebApp (не обязательно, но помогает в мини-аппе) -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="app.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>

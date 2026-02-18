@@ -1,218 +1,264 @@
-(function () {
-  const TOTAL_DAYS = 30;
+// PlayWork Mini App — 30-day challenge (offline/localStorage)
+// Works in Telegram WebApp + normal browser.
 
-  // ====== ДАННЫЕ: 30 дней + задания ======
-  // Меняй текст задач как хочешь.
-  const DAYS = Array.from({ length: TOTAL_DAYS }, (_, i) => {
-    const d = i + 1;
-    return {
+const TOTAL_DAYS = 30;
+const STORAGE_KEY = "playwork_state_v1";
+
+const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+
+// --- UI elements
+const subtitle = document.getElementById("subtitle");
+const dayPill = document.getElementById("dayPill");
+const statusPill = document.getElementById("statusPill");
+const dayDesc = document.getElementById("dayDesc");
+
+const tasksList = document.getElementById("tasksList");
+
+const progressText = document.getElementById("progressText");
+const streakText = document.getElementById("streakText");
+const barFill = document.getElementById("barFill");
+
+const startDayBtn = document.getElementById("startDayBtn");
+const finishDayBtn = document.getElementById("finishDayBtn");
+const nextDayBtn = document.getElementById("nextDayBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+// --- Program data (пример). Ты можешь потом заменить на свои задания.
+const PROGRAM = buildProgram30();
+
+function buildProgram30() {
+  // Простая структура: Day N => { title, tasks[] }
+  // Потом заменим на твою “настоящую” программу.
+  const days = {};
+  for (let d = 1; d <= TOTAL_DAYS; d++) {
+    days[d] = {
       title: `Day ${d}`,
-      desc: d === 1 ? "Стартуем. Сделай минимум и зафиксируй результат." : "Выполни задания и закрой день.",
       tasks: [
-        { t: "Сделать 1 ключевое действие на прогресс (15–30 минут)", note: "Без перфекционизма. Просто сделай." },
-        { t: "Короткая проверка состояния (сон/энергия/фокус)", note: "Оцени по шкале 1–10 и запиши." },
-        { t: "1 маленький шаг в проекте PlayWork", note: "Например: текст, дизайн, список идей, тест." },
+        `План на день (1 главная цель)`,
+        `Фокус-блок 25 минут без отвлечений`,
+        `10 минут ходьбы / растяжки`,
+        `Сон: лечь на 30 минут раньше`,
       ],
     };
-  });
+  }
+  return days;
+}
 
-  // ====== Telegram WebApp (безопасно, если не в Telegram) ======
-  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-  if (tg) {
-    tg.ready();
-    tg.expand();
+// --- State
+let state = loadState();
+
+function defaultState() {
+  return {
+    currentDay: 1,
+    startedDays: {},     // { "1": true }
+    completedDays: {},   // { "1": true }
+    checks: {},          // { "1": [true,false,...] }
+    streak: 0,
+    lastCompletedDay: 0,
+    createdAt: Date.now(),
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    // minimal validation
+    if (!parsed || typeof parsed !== "object") return defaultState();
+    if (!parsed.currentDay) parsed.currentDay = 1;
+    if (!parsed.startedDays) parsed.startedDays = {};
+    if (!parsed.completedDays) parsed.completedDays = {};
+    if (!parsed.checks) parsed.checks = {};
+    if (typeof parsed.streak !== "number") parsed.streak = 0;
+    if (typeof parsed.lastCompletedDay !== "number") parsed.lastCompletedDay = 0;
+    return parsed;
+  } catch {
+    return defaultState();
+  }
+}
+
+function saveState(s) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+// --- Telegram init
+function initTelegram() {
+  if (!tg) {
+    subtitle.textContent = "Web mode (not Telegram)";
+    return;
+  }
+  tg.ready();
+  tg.expand();
+  subtitle.textContent = "Telegram Mini App";
+}
+initTelegram();
+
+// --- Helpers
+function getDayData(day) {
+  return PROGRAM[day] || { title: `Day ${day}`, tasks: ["Task 1", "Task 2"] };
+}
+
+function ensureChecks(day) {
+  const key = String(day);
+  const tasksCount = getDayData(day).tasks.length;
+  if (!Array.isArray(state.checks[key])) {
+    state.checks[key] = new Array(tasksCount).fill(false);
+    saveState(state);
+    return;
+  }
+  // If tasks list changed length
+  if (state.checks[key].length !== tasksCount) {
+    const old = state.checks[key];
+    const next = new Array(tasksCount).fill(false);
+    for (let i = 0; i < Math.min(old.length, next.length); i++) next[i] = !!old[i];
+    state.checks[key] = next;
+    saveState(state);
+  }
+}
+
+function haptic(type = "light") {
+  if (!tg) return;
+  if (tg.HapticFeedback && tg.HapticFeedback.impactOccurred) {
+    tg.HapticFeedback.impactOccurred(type);
+  }
+}
+
+// --- Render
+function render() {
+  const day = state.currentDay;
+  const dayKey = String(day);
+  const data = getDayData(day);
+
+  ensureChecks(day);
+
+  const checks = state.checks[dayKey];
+  const total = checks.length;
+  const doneCount = checks.filter(Boolean).length;
+  const allChecked = total > 0 && doneCount === total;
+
+  const dayStarted = !!state.startedDays[dayKey];
+  const dayCompleted = !!state.completedDays[dayKey];
+
+  dayPill.textContent = `Day ${day} / ${TOTAL_DAYS}`;
+
+  // status
+  if (dayCompleted) {
+    statusPill.textContent = "Completed ✅";
+    statusPill.style.borderColor = "#bbf7d0";
+    statusPill.style.background = "#ecfdf5";
+  } else if (dayStarted) {
+    statusPill.textContent = "In progress 🚀";
+    statusPill.style.borderColor = "#dbeafe";
+    statusPill.style.background = "#eff6ff";
+  } else {
+    statusPill.textContent = "Not started";
+    statusPill.style.borderColor = "";
+    statusPill.style.background = "";
   }
 
-  // ====== DOM ======
-  const dayTitle = document.getElementById("dayTitle");
-  const dayDesc = document.getElementById("dayDesc");
-  const dayPill = document.getElementById("dayPill");
-  const tasksList = document.getElementById("tasksList");
-  const tasksCount = document.getElementById("tasksCount");
+  // main text
+  if (dayCompleted) dayDesc.textContent = `Day ${day} completed ✅`;
+  else if (dayStarted) dayDesc.textContent = `Day ${day} started 🚀`;
+  else dayDesc.textContent = "Нажми Start чтобы начать день";
 
-  const finishDayBtn = document.getElementById("finishDayBtn");
-  const nextDayBtn = document.getElementById("nextDayBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const jumpTodayBtn = document.getElementById("jumpTodayBtn");
+  // progress
+  progressText.textContent = `${doneCount} / ${total}`;
+  streakText.textContent = `Streak: ${state.streak}`;
+  const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+  barFill.style.width = `${pct}%`;
 
-  const progressFill = document.getElementById("progressFill");
-  const progressText = document.getElementById("progressText");
-  const progressPct = document.getElementById("progressPct");
-  const hintText = document.getElementById("hintText");
+  // tasks
+  tasksList.innerHTML = "";
+  data.tasks.forEach((t, idx) => {
+    const row = document.createElement("label");
+    row.className = "task";
 
-  // ====== STORAGE ======
-  const KEY = "playwork_state_v1";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!checks[idx];
+    cb.disabled = !dayStarted || dayCompleted; // нельзя отмечать до Start и после Done
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function saveState(state) {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  }
-
-  function defaultState() {
-    return {
-      currentDay: 1,
-      completedDays: {},
-      checks: {}, // checks[day] = [true/false...]
-      startedAt: Date.now(),
-    };
-  }
-
-  let state = loadState() || defaultState();
-
-  // защита
-  if (!state.currentDay || state.currentDay < 1) state.currentDay = 1;
-  if (state.currentDay > TOTAL_DAYS) state.currentDay = TOTAL_DAYS;
-
-  // ====== UI RENDER ======
-  function render() {
-    const day = state.currentDay;
-    const dayData = DAYS[day - 1];
-
-    dayTitle.textContent = `PlayWork`;
-    dayDesc.textContent = dayData.desc;
-    dayPill.textContent = `Day ${day}`;
-
-    // прогресс по дням
-    const doneCount = Object.keys(state.completedDays).filter((k) => state.completedDays[k] === true).length;
-    const pct = Math.round((doneCount / TOTAL_DAYS) * 100);
-
-    progressFill.style.width = `${pct}%`;
-    progressText.textContent = `${doneCount}/${TOTAL_DAYS}`;
-    progressPct.textContent = `${pct}%`;
-
-    // чек-лист текущего дня
-    const checks = getChecksForDay(day, dayData.tasks.length);
-
-    tasksList.innerHTML = "";
-    dayData.tasks.forEach((task, idx) => {
-      const isChecked = checks[idx] === true;
-
-      const el = document.createElement("div");
-      el.className = "task";
-      el.setAttribute("data-idx", String(idx));
-
-      const box = document.createElement("div");
-      box.className = isChecked ? "checkbox checked" : "checkbox";
-
-      const text = document.createElement("div");
-      text.className = "taskText";
-
-      const h = document.createElement("p");
-      h.className = "taskTitle";
-      h.textContent = task.t;
-
-      const note = document.createElement("p");
-      note.className = "taskNote";
-      note.textContent = task.note || "";
-
-      text.appendChild(h);
-      if (task.note) text.appendChild(note);
-
-      el.appendChild(box);
-      el.appendChild(text);
-
-      el.addEventListener("click", () => toggleTask(day, idx));
-
-      tasksList.appendChild(el);
+    cb.addEventListener("change", () => {
+      state.checks[dayKey][idx] = cb.checked;
+      saveState(state);
+      haptic("light");
+      render();
     });
 
-    tasksCount.textContent = `${dayData.tasks.length} задач`;
+    const textWrap = document.createElement("div");
 
-    // кнопки
-    const allChecked = checks.every((x) => x === true);
-    const dayCompleted = state.completedDays[String(day)] === true;
+    const title = document.createElement("div");
+    title.className = "taskText";
+    title.textContent = t;
 
-    finishDayBtn.disabled = !(allChecked && !dayCompleted);
-    nextDayBtn.disabled = !(dayCompleted && day < TOTAL_DAYS);
+    const small = document.createElement("div");
+    small.className = "taskSmall";
+    small.textContent = dayCompleted ? "Locked (completed)" : (!dayStarted ? "Locked (press Start)" : "Tap to mark");
 
-    if (dayCompleted) {
-      hintText.textContent = "День завершён ✅ Можно перейти дальше.";
-    } else if (allChecked) {
-      hintText.textContent = "Все задания отмечены. Нажми «Завершить день».";
-    } else {
-      hintText.textContent = "Отметь все задания, чтобы завершить день.";
-    }
+    textWrap.appendChild(title);
+    textWrap.appendChild(small);
+
+    row.appendChild(cb);
+    row.appendChild(textWrap);
+    tasksList.appendChild(row);
+  });
+
+  // buttons logic
+  startDayBtn.disabled = dayStarted || dayCompleted;
+  finishDayBtn.disabled = !(dayStarted && allChecked && !dayCompleted);
+  nextDayBtn.disabled = !(dayCompleted && day < TOTAL_DAYS);
+
+  // Button labels
+  startDayBtn.textContent = dayStarted ? "Started" : "Start";
+  finishDayBtn.textContent = dayCompleted ? "Done ✅" : "Done ✅";
+  nextDayBtn.textContent = day < TOTAL_DAYS ? "Next day →" : "Finish";
+}
+
+// --- Actions
+startDayBtn.addEventListener("click", () => {
+  const day = state.currentDay;
+  const dayKey = String(day);
+  state.startedDays[dayKey] = true;
+  saveState(state);
+  haptic("medium");
+  render();
+});
+
+finishDayBtn.addEventListener("click", () => {
+  const day = state.currentDay;
+  const dayKey = String(day);
+
+  state.completedDays[dayKey] = true;
+
+  // streak logic: if completing day in sequence
+  if (state.lastCompletedDay === day - 1) state.streak += 1;
+  else if (state.lastCompletedDay !== day) state.streak = 1;
+
+  state.lastCompletedDay = day;
+
+  saveState(state);
+  haptic("heavy");
+  render();
+});
+
+nextDayBtn.addEventListener("click", () => {
+  if (state.currentDay < TOTAL_DAYS) {
+    state.currentDay += 1;
+    saveState(state);
+    haptic("medium");
+    render();
   }
+});
 
-  function getChecksForDay(day, len) {
-    const k = String(day);
-    const arr = Array.isArray(state.checks[k]) ? state.checks[k] : Array(len).fill(false);
-    if (arr.length !== len) {
-      const fixed = Array(len).fill(false).map((_, i) => arr[i] === true);
-      state.checks[k] = fixed;
-      saveState(state);
-      return fixed;
-    }
-    return arr;
-  }
+resetBtn.addEventListener("click", () => {
+  const ok = confirm("Сбросить прогресс полностью?");
+  if (!ok) return;
+  state = defaultState();
+  saveState(state);
+  haptic("heavy");
+  render();
+});
 
-  function toggleTask(day, idx) {
-    const dayData = DAYS[day - 1];
-    const checks = getChecksForDay(day, dayData.tasks.length);
-    checks[idx] = !checks[idx];
-    state.checks[String(day)] = checks;
-    saveState(state);
-    render();
-  }
-
-  // ====== ACTIONS ======
-  finishDayBtn.addEventListener("click", () => {
-    const day = state.currentDay;
-    state.completedDays[String(day)] = true;
-    saveState(state);
-
-    if (tg) {
-      tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success");
-    }
-    render();
-  });
-
-  nextDayBtn.addEventListener("click", () => {
-    if (state.currentDay < TOTAL_DAYS) {
-      state.currentDay += 1;
-      saveState(state);
-      render();
-    }
-  });
-
-  jumpTodayBtn.addEventListener("click", () => {
-    // "текущий" — это первый незавершённый день
-    let target = 1;
-    for (let d = 1; d <= TOTAL_DAYS; d++) {
-      if (state.completedDays[String(d)] !== true) {
-        target = d;
-        break;
-      }
-      target = d;
-    }
-    state.currentDay = target;
-    saveState(state);
-    render();
-  });
-
-  resetBtn.addEventListener("click", () => {
-    const ok = confirm("Сбросить прогресс? Это удалит все отметки и дни.");
-    if (!ok) return;
-    state = defaultState();
-    saveState(state);
-    render();
-  });
-
-  // ====== START ======
-  document.addEventListener("DOMContentLoaded", () => {
-    // если открыто в Telegram — можно подстроить тему/цвета
-    if (tg && tg.themeParams) {
-      // Ничего критичного. Можно позже добавить динамическую тему.
-    }
-    render();
-  });
-})();
+// first render
+render();
