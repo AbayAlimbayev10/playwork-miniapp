@@ -1,21 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>PlayWork</title>
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <main id="app" class="screen">
-    <h1 class="title">PlayWork</h1>
-    <p id="status" class="status">Loading...</p>
+  <div class="app">
 
-    <button id="startBtn" class="btn">Start</button>
-    <p id="done" class="done" style="display:none;">Done ✅</p>
-  </main>
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">PW</div>
+        <div class="brandText">
+          <div class="brandName">PlayWork</div>
+          <div class="brandSub" id="subtitle">30-day challenge</div>
+        </div>
+      </div>
 
-  <script src="./app.js"></script>
+      <button class="ghostBtn" id="resetBtn" type="button">Сброс</button>
+    </header>
+
+    <section class="card">
+      <div class="row">
+        <div class="titleBlock">
+          <h1 id="dayTitle">Загрузка…</h1>
+          <p class="muted" id="dayDesc">Подготовка данных</p>
+        </div>
+        <div class="pill" id="dayPill">Day ?</div>
+      </div>
+
+      <div class="progressWrap">
+        <div class="progressBar">
+          <div class="progressFill" id="progressFill"></div>
+        </div>
+        <div class="progressText">
+          <span id="progressText">0/30</span>
+          <span class="muted" id="progressPct">0%</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="sectionHead">
+        <h2>Задания дня</h2>
+        <span class="muted" id="tasksCount">0 задач</span>
+      </div>
+
+      <div id="tasksList" class="tasksList"></div>
+
+      <div class="actions">
+        <button class="primaryBtn" id="finishDayBtn" type="button" disabled>Завершить день</button>
+        <button class="secondaryBtn" id="nextDayBtn" type="button" disabled>Следующий день</button>
+      </div>
+
+      <p class="hint" id="hintText">Отметь все задания, чтобы завершить день.</p>
+    </section>
+
+    <footer class="footer">
+      <button class="linkBtn" id="jumpTodayBtn" type="button">Перейти к текущему дню</button>
+      <span class="muted">v1.0</span>
+    </footer>
+
+  </div>
+
+  <!-- Telegram WebApp (не обязательно, но помогает в мини-аппе) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
