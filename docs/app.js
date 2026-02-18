@@ -1,22 +1,20 @@
-;const tg = window.Telegram?.WebApp;
-
-if (!tg) {
-  console.log("Not in Telegram");
-} else {
-  tg.expand();
-  console.log("In Telegram", tg.initDataUnsafe?.user);
-}const tg = window.Telegram.WebApp;
+const tg = window.Telegram.WebApp;
+tg.ready();
 tg.expand();
 
-document.getElementById("status").innerText =
-  tg.initDataUnsafe?.user
-    ? `Hello, ${tg.initDataUnsafe.user.first_name}`
-    : "Opened outside Telegram";
+const status = document.getElementById("status");
+const startBtn = document.getElementById("startBtn");
 
-if (tg.initDataUnsafe?.user) {
-  document.getElementById("startBtn").style.display = "block";
+// Telegram user
+const user = tg.initDataUnsafe?.user;
+
+if (user) {
+  status.textContent = `Hello, ${user.first_name}`;
+} else {
+  status.textContent = "Opened outside Telegram";
 }
 
-document.getElementById("startBtn").onclick = () => {
-  alert("PlayWork started");
-};
+startBtn.addEventListener("click", () => {
+  status.textContent = "Day 1 started 🚀";
+  tg.HapticFeedback.impactOccurred("medium");
+});init
