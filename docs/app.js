@@ -277,7 +277,16 @@ function updateDayUI(day) {
 updateDayUI(day);
 
 // обработка кнопки Start
-startBtn.addEventListener("click", () => {
+startBtn.addEventListener("click",localStorage.removeItem('day');  {// HARD RESET (на время теста)
+localStorage.clear();
+
+// стартуем заново
+let day = 1;
+statusEl.textContent = `Day ${day} started 🚀`;}     // сброс счетчика
+localStorage.removeItem('startDate'); // если есть
+day = 1;
+localStorage.setItem('day', String(day));
+statusEl.textContent = `Day ${day} started 🚀`; () => {
   day++;
   localStorage.setItem("day", day);
   updateDayUI(day);
