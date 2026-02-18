@@ -1,4 +1,6 @@
-:root{
+:.hidden {
+  display: none;
+}root{
   --bg1:#0b1020;
   --bg2:#0a0f1a;
   --card:#0f1730cc;
