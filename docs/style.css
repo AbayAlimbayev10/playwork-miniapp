@@ -1,88 +1,25 @@
-:.hidden {
-  display: none;
-}root{
-  --bg1:#0b1020;
-  --bg2:#0a0f1a;
-  --card:#0f1730cc;
-  --text:#e8ecff;
-  --muted:#aab3d6;
-  --accent:#6ea8ff;
-  --accent2:#42ffb0;
-  --border:#243056;
-}
-
-*{box-sizing:border-box}
 body{
   margin:0;
-  font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial;
-  background: radial-gradient(1200px 600px at 20% 10%, #17234a 0%, var(--bg1) 45%, var(--bg2) 100%);
-  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;
+  background:#ffffff;
 }
-.container{
+.screen{
   min-height:100vh;
   display:flex;
-  align-items:center;
+  flex-direction:column;
   justify-content:center;
-  padding:24px;
+  align-items:center;
+  text-align:center;
+  gap:14px;
 }
-.card{
-  width:min(520px, 100%);
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:22px;
-  backdrop-filter: blur(10px);
-}
-.title{
-  margin:0 0 6px;
-  font-size:26px;
-  letter-spacing:0.2px;
-}
-.status{
-  margin:0 0 16px;
-  color:var(--muted);
-}
-.block{
-  background: rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:14px;
-}
-.label{
-  color:var(--accent2);
-  font-weight:700;
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:0.12em;
-}
-.big{
-  margin-top:6px;
-  font-size:18px;
-  font-weight:650;
-}
-.muted{
-  margin-top:8px;
-  color:var(--muted);
-  line-height:1.4;
-}
-.list{
-  margin:10px 0 0;
-  padding-left:18px;
-  color:var(--text);
-}
+.title{ font-size:48px; margin:0; }
+.status{ font-size:20px; margin:0; opacity:.7; }
 .btn{
-  width:100%;
+  padding:12px 24px;
+  border-radius:12px;
   border:0;
-  border-radius:14px;
-  padding:14px 14px;
-  font-size:16px;
-  font-weight:700;
-  background: linear-gradient(90deg, var(--accent) 0%, #9b7bff 60%, var(--accent2) 110%);
-  color:#0b1020;
+  background:#2a7fff;
+  color:#fff;
+  font-size:18px;
 }
-.btn.secondary{
-  background: rgba(255,255,255,0.1);
-  color:var(--text);
-  border:1px solid rgba(255,255,255,0.14);
-}
+.done{ font-size:22px; }

@@ -1,33 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PlayWork</title>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
-  <h1 id="title">PlayWork</h1>
-  <p id="status">Loading...</p>
+  <main id="app" class="screen">
+    <h1 class="title">PlayWork</h1>
+    <p id="status" class="status">Loading...</p>
 
-  <button id="startBtn">Start</button>
-  <button id="doneBtn" style="display:none;">Done ✅</button>
-
-  <script src="app.js"></script>
-</body>
-  <main class="container">
-    <div class="card">
-      <h1 class="title">PlayWork</h1>
-      <p id="status" class="status">Loading…</p>
-
-      <div id="screen"></div>
-
-      <button id="startBtn" class="btn">Start</button>
-      <button id="doneBtn" class="btn secondary">Done ✅</button>
-    </div>
+    <button id="startBtn" class="btn">Start</button>
+    <p id="done" class="done" style="display:none;">Done ✅</p>
   </main>
 
   <script src="./app.js"></script>
