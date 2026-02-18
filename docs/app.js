@@ -43,3 +43,26 @@ doneBtn.addEventListener("click", () => {
 
   document.getElementById("status").textContent = `Day ${day} started 🚀`;
 });
+const startBtn = document.getElementById("startBtn");
+const statusEl = document.getElementById("status");
+const resultEl = document.getElementById("result");
+
+// 1) при загрузке
+statusEl.textContent = "Ready";
+
+// 2) читаем сохранённый день (если есть)
+let day = Number(localStorage.getItem("day") || 0);
+
+if (day > 0) {
+  statusEl.textContent = `Day ${day} started 🚀`;
+  resultEl.textContent = "Done ✅";
+}
+
+// 3) по кнопке Start
+startBtn.addEventListener("click", () => {
+  if (day === 0) day = 1;      // стартуем Day 1
+  localStorage.setItem("day", String(day));
+
+  statusEl.textContent = `Day ${day} started 🚀`;
+  resultEl.textContent = "Done ✅";
+});
