@@ -1,31 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
   const startBtn = document.getElementById("startBtn");
-  const statusEl = document.getElementById("status");
-
-  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const status = document.getElementById("status");
+  const done = document.getElementById("done");
 
   let startDate = localStorage.getItem("startDate");
 
-  // Если старт уже был — считаем день
   if (startDate) {
-    startDate = new Date(startDate);
-    const today = new Date();
-    const diffDays = Math.floor((today - startDate) / MS_PER_DAY) + 1;
+    const days =
+      Math.floor(
+        (Date.now() - Number(startDate)) / (1000 * 60 * 60 * 24)
+      ) + 1;
 
-    statusEl.textContent = `Day ${diffDays} started 🚀`;
+    status.textContent = `Day ${days} started 🚀`;
     startBtn.style.display = "none";
-    return;
+    done.style.display = "block";
   }
 
-  // Если старта не было — ждём кнопку
-  statusEl.textContent = "Ready to start";
-  startBtn.style.display = "inline-block";
-
   startBtn.addEventListener("click", () => {
-    const now = new Date();
-    localStorage.setItem("startDate", now.toISOString());
+    if (!localStorage.getItem("startDate")) {
+      localStorage.setItem("startDate", Date.now());
+    }
 
-    statusEl.textContent = "Day 1 started 🚀";
+    status.textContent = "Day 1 started 🚀";
     startBtn.style.display = "none";
+    done.style.display = "block";
   });
 });
