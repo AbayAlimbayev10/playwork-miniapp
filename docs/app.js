@@ -262,3 +262,124 @@ resetBtn.addEventListener("click", () => {
 
 // first render
 render();
+// ===== PlayWork: Button Logic (MVP) =====
+
+// CONFIG
+const MIN_DONE_TASKS = 3; // сколько задач нужно, чтобы нажать Done
+
+// DOM (проверь, что id/class совпадают с твоим HTML)
+const btnStart = document.querySelector("#btnStart");     // Started
+const btnDone  = document.querySelector("#btnDone");      // Done ✅
+const btnNext  = document.querySelector("#btnNext");      // Next day →
+const taskCheckboxes = Array.from(document.querySelectorAll(".task-checkbox")); // чекбоксы задач
+
+const dayLabel = document.querySelector("#dayLabel");     // "Day 1 / 30"
+const progressLabel = document.querySelector("#progressLabel"); // "0/4"
+const streakLabel = document.querySelector("#streakLabel"); // "Streak: 0"
+
+// STATE (пока без сохранения — просто логика)
+let state = {
+  day: 1,
+  totalDays: 30,
+  status: "locked", // "locked" | "active" | "completed"
+  completedCount: 0,
+  streak: 0
+};
+
+// ===== Helpers =====
+function setTasksEnabled(enabled) {
+  taskCheckboxes.forEach(cb => {
+    cb.disabled = !enabled;
+    // если хочешь визуально "серить" карточки — добавим класс
+    const card = cb.closest(".task-card");
+    if (card) card.classList.toggle("disabled", !enabled);
+  });
+}
+
+function updateCounts() {
+  state.completedCount = taskCheckboxes.filter(cb => cb.checked).length;
+}
+
+function updateUI() {
+  // labels
+  if (dayLabel) dayLabel.textContent = `Day ${state.day} / ${state.totalDays}`;
+  if (progressLabel) progressLabel.textContent = `${state.completedCount} / ${taskCheckboxes.length}`;
+  if (streakLabel) streakLabel.textContent = `Streak: ${state.streak}`;
+
+  // tasks enabled by status
+  if (state.status === "locked") setTasksEnabled(false);
+  if (state.status === "active") setTasksEnabled(true);
+  if (state.status === "completed") setTasksEnabled(false);
+
+  // buttons visibility / enabled
+  if (btnStart) {
+    btnStart.disabled = state.status !== "locked";
+    btnStart.style.opacity = (state.status === "locked") ? "1" : "0.5";
+  }
+
+  if (btnDone) {
+    const canDone = (state.status === "active" && state.completedCount >= MIN_DONE_TASKS);
+    btnDone.disabled = !canDone;
+    btnDone.style.opacity = canDone ? "1" : "0.5";
+  }
+
+  if (btnNext) {
+    const canNext = (state.status === "completed");
+    btnNext.disabled = !canNext;
+    btnNext.style.opacity = canNext ? "1" : "0.5";
+  }
+}
+
+// ===== Events =====
+taskCheckboxes.forEach(cb => {
+  cb.addEventListener("change", () => {
+    // если день не active — не даём менять (на всякий)
+    if (state.status !== "active") {
+      cb.checked = !cb.checked; // откат
+      return;
+    }
+    updateCounts();
+    updateUI();
+  });
+});
+
+if (btnStart) {
+  btnStart.addEventListener("click", () => {
+    if (state.status !== "locked") return;
+    state.status = "active";
+    updateCounts();
+    updateUI();
+  });
+}
+
+if (btnDone) {
+  btnDone.addEventListener("click", () => {
+    updateCounts();
+    if (!(state.status === "active" && state.completedCount >= MIN_DONE_TASKS)) return;
+
+    state.status = "completed";
+    state.streak += 1; // пока упрощённо: закрытый день = +1 к streak
+    updateUI();
+  });
+}
+
+if (btnNext) {
+  btnNext.addEventListener("click", () => {
+    if (state.status !== "completed") return;
+
+    // следующий день
+    if (state.day < state.totalDays) state.day += 1;
+
+    // сброс задач
+    taskCheckboxes.forEach(cb => (cb.checked = false));
+
+    // новый день locked
+    state.status = "locked";
+    updateCounts();
+    updateUI();
+  });
+}
+
+// ===== Init =====
+updateCounts();
+updateUI();
