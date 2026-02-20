@@ -2,59 +2,72 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PlayWork</title>
 
-  <!-- Telegram WebApp SDK -->
+  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+  <!-- Styles -->
   <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body>
   <main class="wrap">
     <section class="card">
+
+      <!-- BRAND -->
       <div class="brand">
-        <div class="logo">PlayWork</div>
-        <div class="sub" id="subtitle">Loading…</div>
+        <h1>PlayWork</h1>
+        <div class="subtitle">Telegram Mini App</div>
       </div>
 
+      <!-- META -->
       <div class="meta">
-        <div class="pill" id="dayPill">Day 1</div>
-        <div class="pill" id="statusPill">Not started</div>
+        <span class="pill" id="dayLabel">Day 1 / 30</span>
+        <span class="pill" id="statusPill">Not started</span>
       </div>
 
-      <div class="desc" id="dayDesc">Нажми Start чтобы начать день</div>
+      <!-- DESCRIPTION -->
+      <div class="desc" id="dayDesc">
+        Нажми Start, чтобы начать день
+      </div>
 
+      <!-- PROGRESS -->
       <div class="progress">
         <div class="progressRow">
-          <div class="progressText" id="progressText">0 / 0</div>
-          <div class="progressText" id="streakText">Streak: 0</div>
+          <div id="progressLabel">0 / 4</div>
+          <div id="streakLabel">Streak: 0</div>
         </div>
         <div class="bar">
           <div class="barFill" id="barFill" style="width:0%"></div>
         </div>
       </div>
 
+      <!-- TASKS -->
       <div class="tasks">
         <div class="tasksTitle">Today tasks</div>
-        <div id="tasksList" class="tasksList"></div>
+        <div id="tasksList" class="tasksList">
+          <!-- задачи рендерятся из app.js -->
+        </div>
       </div>
 
+      <!-- ACTIONS -->
       <div class="actions">
-        <div id="dayLabel">Day 1 / 30</div>
-<div id="progressLabel">0 / 4</div>
-<div id="streakLabel">Streak: 0</div>
-        <button id="btnStart" class="btn primary">Started</button>
-
-<button id="btnDone" class="btn success">Done ✅</button>
-<button id="btnNext" class="btn ghost">Next day →</button>
+        <button id="btnStart" class="btn primary">Start</button>
+        <button id="btnDone" class="btn success" disabled>Done ✅</button>
+        <button id="btnNext" class="btn ghost" disabled>Next day →</button>
       </div>
 
+      <!-- FOOTER -->
       <div class="footer">
-        <button class="linkBtn" id="resetBtn" type="button">Reset progress</button>
+        <button id="resetBtn" class="linkBtn">Reset progress</button>
       </div>
+
     </section>
   </main>
+
+  <!-- APP LOGIC -->
   <script src="./app.js"></script>
 </body>
 </html>
